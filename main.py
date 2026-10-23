@@ -188,13 +188,21 @@ def main():
         print("  5. Entertainment")
         print("  6. Health")
         print("  7. Search by custom keyword")
-        print("  8. Exit")
+        print("  8. Launch Web App in Browser")
+        print("  9. Exit")
 
-        choice = input("\nEnter choice (1-8): ").strip()
+        choice = input("\nEnter choice (1-9): ").strip()
 
-        if choice == "8":
+        if choice == "9":
             print("\nThanks for using News Fetcher. Goodbye!")
             break
+
+        if choice == "8":
+            print("\nStarting News Fetcher Web Server on http://127.0.0.1:8000 ...")
+            import subprocess
+            import sys
+            subprocess.run([sys.executable, "app.py"])
+            continue
 
         if choice in categories:
             topic = categories[choice]
@@ -206,7 +214,7 @@ def main():
                 continue
             is_category = False
         else:
-            print("Invalid choice. Please select 1 through 8.")
+            print("Invalid choice. Please select 1 through 9.")
             continue
 
         # Optional learning feature: Ask if the user wants to see the raw JSON

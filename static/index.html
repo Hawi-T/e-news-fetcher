@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>News Fetcher | Live Global Headlines & Topic Search</title>
+  <meta name="description" content="A modern, real-time command-line and web news aggregator powered by Python, FastAPI, and NewsAPI. Explore top headlines or search any topic.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <!-- Background Glow Accents -->
+  <div class="glow-bg glow-primary" aria-hidden="true"></div>
+  <div class="glow-bg glow-secondary" aria-hidden="true"></div>
+
+  <!-- Main Container -->
+  <div class="app-layout">
+    <!-- Header -->
+    <header class="app-header">
+      <div class="brand">
+        <div class="brand-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"></path>
+            <path d="M18 14h-8"></path>
+            <path d="M15 18h-5"></path>
+            <path d="M10 6h8v4h-8V6Z"></path>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <span class="brand-pill">AI Automation & Python</span>
+          <h1>News Fetcher <span class="brand-highlight">Live</span></h1>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <div class="status-indicator" id="api-status-badge">
+          <span class="status-dot"></span>
+          <span class="status-label">NewsAPI Ready</span>
+        </div>
+        <button id="view-mode-toggle" class="btn-ghost" title="Toggle between formatted news cards and raw JSON">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="16 18 22 12 16 6"></polyline>
+            <polyline points="8 6 2 12 8 18"></polyline>
+          </svg>
+          <span id="view-mode-text">View Raw JSON</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Hero / Search Control Center -->
+    <section class="control-panel">
+      <!-- Search Form -->
+      <form id="search-form" class="search-bar" role="search">
+        <div class="search-input-wrapper">
+          <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input
+            type="search"
+            id="search-input"
+            placeholder="Search any keyword (e.g. 'Artificial Intelligence', 'SpaceX', 'Quantum')..."
+            autocomplete="off"
+            required
+          >
+          <button type="submit" id="search-submit-btn" class="btn-primary">
+            <span>Search</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+              <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+          </button>
+        </div>
+      </form>
+
+      <!-- Category Filter Chips -->
+      <nav class="category-nav" aria-label="News Categories">
+        <span class="category-label">Quick Topics:</span>
+        <div class="category-chips" id="category-chips">
+          <button class="chip active" data-category="technology">
+            <span class="chip-icon">⚡</span> Technology
+          </button>
+          <button class="chip" data-category="sports">
+            <span class="chip-icon">⚽</span> Sports
+          </button>
+          <button class="chip" data-category="business">
+            <span class="chip-icon">📈</span> Business
+          </button>
+          <button class="chip" data-category="science">
+            <span class="chip-icon">🔬</span> Science
+          </button>
+          <button class="chip" data-category="entertainment">
+            <span class="chip-icon">🎬</span> Entertainment
+          </button>
+          <button class="chip" data-category="health">
+            <span class="chip-icon">🧬</span> Health
+          </button>
+        </div>
+      </nav>
+    </section>
+
+    <!-- Results Section -->
+    <main class="results-container" id="results-container">
+      <div class="results-header">
+        <div class="results-title-group">
+          <h2 id="current-query-title">Top Headlines: Technology</h2>
+          <span class="results-count-badge" id="results-count">5 Articles</span>
+        </div>
+        <div class="refresh-action">
+          <button id="refresh-btn" class="btn-icon" title="Refresh articles">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"></path>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Error State Banner -->
+      <div id="error-banner" class="error-banner hidden" role="alert">
+        <div class="error-icon">⚠️</div>
+        <div class="error-content">
+          <h3 id="error-title">Unable to fetch news</h3>
+          <p id="error-message">Please check your configuration or network connection.</p>
+        </div>
+        <button id="error-retry-btn" class="btn-secondary">Retry</button>
+      </div>
+
+      <!-- News Cards Grid View -->
+      <div id="news-grid" class="news-grid">
+        <!-- Rendered dynamically by app.js -->
+      </div>
+
+      <!-- Raw JSON View (For Educational Inspection) -->
+      <div id="json-view" class="json-container hidden">
+        <div class="json-toolbar">
+          <span class="json-tag">HTTP Response Body (JSON)</span>
+          <button id="copy-json-btn" class="btn-ghost btn-sm">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+            </svg>
+            <span id="copy-text">Copy JSON</span>
+          </button>
+        </div>
+        <pre><code id="json-code">Loading raw data...</code></pre>
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="app-footer">
+      <div class="footer-content">
+        <p>Built with <strong>Python & FastAPI</strong> • Powered by <a href="https://newsapi.org" target="_blank" rel="noopener">NewsAPI.org</a></p>
+        <p class="footer-sub">Clean architecture • Secure environment variables • Ready for Cloud Deployment</p>
+      </div>
+    </footer>
+  </div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
