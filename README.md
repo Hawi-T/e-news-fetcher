@@ -10,9 +10,9 @@ A beginner-friendly Python command-line application that connects to [NewsAPI](h
 - **Top 5 Curated Articles**: Cleanly displays Article Title, News Source, Short Description, and Web Link.
 - **Secure Secrets Management**: Keeps your API key private using `.env` and `python-dotenv`.
 - **Robust Error Handling**:
-  - Handles invalid / missing API keys (HTTP 401).
+  - Handles invalid or missing API keys (HTTP 401).
   - Handles network disconnects (`ConnectionError`) and timeouts (`Timeout`).
-  - Handles missing fields (e.g., articles with missing descriptions or unknown sources).
+  - Handles missing fields (e.g., articles with missing descriptions, deleted articles marked `[Removed]`, or unknown sources).
   - Handles queries with 0 results.
 - **Learning Mode**: Optional prompt to view the raw JSON data payload directly before it gets parsed.
 
@@ -25,7 +25,7 @@ News Fetcher/
 ├── .env                # Private API key (ignored by Git - NEVER commit this!)
 ├── .env.example        # Example template for setting up keys
 ├── .gitignore          # Tells Git to ignore .env and cache folders
-├── main.py             # Main application logic and functions
+├── main.py             # Main application logic and modular functions
 ├── requirements.txt    # Python dependencies list
 └── README.md           # Documentation and setup instructions
 ```
@@ -39,7 +39,8 @@ News Fetcher/
 
 ### 2. Clone or Open the Repository
 ```bash
-cd "News Fetcher"
+git clone https://github.com/Hawi-T/e-news-fetcher.git
+cd e-news-fetcher
 ```
 
 ### 3. Install Dependencies
@@ -52,9 +53,13 @@ pip install -r requirements.txt
 2. Copy your API Key from the dashboard.
 
 ### 5. Configure Your `.env` File
-Open the `.env` file in the project folder and replace `your_api_key_here` with your actual key:
+Create a `.env` file in the project folder (or copy from `.env.example`):
+```bash
+cp .env.example .env
+```
+Open `.env` and paste your actual API key:
 ```env
-NEWS_API_KEY=1234567890abcdef1234567890abcdef
+NEWS_API_KEY=your_actual_key_here
 ```
 
 ### 6. Run the App
@@ -64,35 +69,80 @@ python main.py
 
 ---
 
-## 💡 How It Works (Concepts Explained)
+## 💻 Example Output
 
-1. **Environment Variables (`.env`)**: Secret tokens like API keys should never be hardcoded into Python files. `python-dotenv` loads key-value pairs into `os.environ` so your code remains safe to share publicly.
-2. **HTTP GET Requests (`requests`)**: Communicates with web servers using the standard Web protocol to request data from NewsAPI endpoints (`/v2/top-headlines` or `/v2/everything`).
-3. **Query Parameters**: Values appended to an API URL (like `?category=technology&pageSize=5&apiKey=...`) to filter and instruct the server on what exact data to send back.
-4. **JSON Parsing (`data.json()`)**: The server returns JSON text (JavaScript Object Notation), which Python translates into native dictionaries and lists for easy manipulation.
+```text
+=======================================================
+        WELCOME TO THE PYTHON NEWS FETCHER             
+=======================================================
+
+Select an option:
+  1. Technology
+  2. Sports
+  3. Business
+  4. Science
+  5. Entertainment
+  6. Health
+  7. Search by custom keyword
+  8. Exit
+
+Enter choice (1-8): 1
+Inspect raw JSON response before parsing? (y/n, default=n): n
+
+Fetching news for 'technology'...
+
+======================================================================
+ TOP 5 NEWS HEADLINES: TECHNOLOGY
+======================================================================
+
+[1] Phantom Blade Zero launch trailer, PS5 physical editions launch in 2027 - Gematsu
+    Source      : Gematsu
+    Description : S-GAME has released the launch trailer for Wuxia action RPG Phantom Blade Zero, as well as announced that physical standard, Deluxe, and Ultimate editions will launch for PlayStation 5 in 2027.
+    Link        : https://www.gematsu.com/2026/10/phantom-blade-zero-launch-trailer-ps5-physical-editions-launch-in-2027
+----------------------------------------------------------------------
+
+[2] iPhone Duo Reviewers Really Miss Face ID - MacRumors
+    Source      : MacRumors
+    Description : Touch ID on the iPhone Duo might end up being frustrating for some users, based on media reviews that came out today. Multiple reviewers found Touch...
+    Link        : https://www.macrumors.com/2026/10/21/iphone-duo-touch-id-complaints/
+----------------------------------------------------------------------
+
+[3] Giant iPhone Duo installations spotted at Apple Fifth Avenue ahead of Friday launch - 9to5Mac
+    Source      : 9to5Mac
+    Description : While the iPhone Duo doesn't launch until Friday, preparations are already underway at Apple's flagship Fifth Avenue store in New York for the big day.
+    Link        : https://9to5mac.com/2026/10/21/giant-iphone-duo-installations-spotted-at-apple-fifth-avenue-ahead-of-friday-launch/
+----------------------------------------------------------------------
+
+[4] Xbox wants you to pay 24 to 40 cents per hour to stream games you already bought - Ars Technica
+    Source      : Ars Technica
+    Description : Time-based a la carte charges come on top of the purchase price for the games themselves.
+    Link        : https://arstechnica.com/gaming/2026/10/xbox-wants-you-to-pay-24-to-40-cents-per-hour-to-stream-games-you-already-bought/
+----------------------------------------------------------------------
+
+[5] Bose acquires Skullcandy to help it reach a wider audience - The Verge
+    Source      : The Verge
+    Description : Details about the deal weren't revealed, but Skullcandy will remain a separate brand under Bose's premium consumer audio business.
+    Link        : https://www.theverge.com/tech/1015276/bose-acquisition-skullcandy-headphones-earbuds-speakers
+----------------------------------------------------------------------
+```
 
 ---
 
-## 📦 Pushing to GitHub
+## 💡 How It Works (Concepts Explained)
 
-Run these commands in your project terminal:
+1. **Environment Variables (`.env`)**: Secret tokens like API keys should never be hardcoded into Python files. `python-dotenv` loads key-value pairs into `os.environ` so your code remains safe to share publicly.
+2. **HTTP GET Requests (`requests`)**: Communicates with web servers using standard HTTP requests to fetch news data from NewsAPI endpoints (`/v2/top-headlines` or `/v2/everything`).
+3. **Query Parameters**: Key-value pairs appended to an API URL (such as `?category=technology&pageSize=10&apiKey=...`) to instruct the server what data to filter and return.
+4. **JSON Parsing (`data.json()`)**: The server returns JSON text (JavaScript Object Notation), which Python translates into native dictionaries and lists for safe indexing and extraction.
+
+---
+
+## 📦 Pushing Changes to GitHub
+
+To push future updates:
 
 ```bash
-# 1. Initialize git repository
-git init
-
-# 2. Stage all files (.gitignore automatically prevents .env from being added)
 git add .
-
-# 3. Create initial commit
-git commit -m "Initial commit: Command-line News Fetcher in Python"
-
-# 4. Set default branch to main
-git branch -M main
-
-# 5. Connect to your GitHub repository (replace with your repo URL)
-git remote add origin https://github.com/<YOUR-USERNAME>/news-fetcher.git
-
-# 6. Push to GitHub
-git push -u origin main
+git commit -m "Your descriptive commit message"
+git push
 ```

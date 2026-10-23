@@ -40,7 +40,7 @@ def fetch_news(topic_or_keyword, is_category=False, show_raw_json=False):
         params = {
             "category": topic_or_keyword,
             "language": "en",
-            "pageSize": 5,
+            "pageSize": 10,
             "apiKey": api_key
         }
     else:
@@ -49,7 +49,7 @@ def fetch_news(topic_or_keyword, is_category=False, show_raw_json=False):
             "q": topic_or_keyword,
             "language": "en",
             "sortBy": "publishedAt",
-            "pageSize": 5,
+            "pageSize": 10,
             "apiKey": api_key
         }
 
@@ -111,12 +111,16 @@ def parse_articles(raw_data):
 
     cleaned_articles = []
     for item in articles_list:
+        # NewsAPI sometimes returns takedown placeholders with title "[Removed]"
+        title = item.get("title")
+        if not title or title.strip() == "[Removed]":
+            continue
+
         # Safe extraction for nested source: source can be None or a dict
         source_data = item.get("source") or {}
         source_name = source_data.get("name") or "Unknown Source"
 
         # Safe extraction with defaults for missing or empty fields
-        title = item.get("title") or "No Title Available"
         description = item.get("description") or "No description provided."
         url = item.get("url") or "No link provided"
 
@@ -126,6 +130,10 @@ def parse_articles(raw_data):
             "description": description.strip(),
             "url": url.strip()
         })
+
+        # Stop once we have reached the desired top 5 articles
+        if len(cleaned_articles) == 5:
+            break
 
     return cleaned_articles
 
